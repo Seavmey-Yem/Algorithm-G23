@@ -191,3 +191,117 @@ def main():
 if __name__ == "__main__":
     main()
 
+
+#code for IT admin excel
+import platform
+import subprocess
+import socket
+import psutil
+import pandas as pd
+import os
+
+def get_powershell_data(command):
+    """
+    Helper function to run PowerShell commands and retrieve output.
+    """
+    try:
+        result = subprocess.run(["powershell", "-Command", command], capture_output=True, text=True)
+        return result.stdout.strip() or "Unknown"
+    except Exception as e:
+        print(f"Error running PowerShell command: {e}")
+        return "Unknown"
+
+def get_username():
+    return os.getlogin()
+def get_memory():
+    virtual_memory = psutil.virtual_memory()
+    total_ram = int(virtual_memory.total / (1024 ** 3))
+    return f"{total_ram}GB"
+
+def get_harddisk():
+    total_space = sum(psutil.disk_usage(part.mountpoint).total for part in psutil.disk_partitions())  # Total bytes
+    return f"{int(total_space / (1024 ** 3 ) / 2)}GB"  # Convert to GB and format
+
+def get_system_info(n):
+    """
+    Collect detailed system information matching the table structure.
+    """
+    try:
+        
+        # # System Specification: Processor, RAM, Storage
+        processor = platform.processor()
+        ram = round(psutil.virtual_memory().total / (1024 ** 3))  # Convert bytes to GB
+        # storage = "256"
+        # specification = f"{processor}, {ram}GB, {storage}"
+
+        # Format the specification as 'I5-12, 12GB, 256GB'
+        specification =get_memory(), get_harddisk()
+        # specification = f"{cpu_model}, CPU, {ram}GB RAM"
+        # Username (Hostname)
+        username = get_username()
+        asset_tag = socket.gethostname()
+
+        # Serial Number (Using PowerShell)
+        serial_number = get_powershell_data("(Get-WmiObject -Class Win32_BIOS).SerialNumber")
+
+        # System Model (Using PowerShell)
+        system_model = get_powershell_data("(Get-WmiObject -Class Win32_ComputerSystem).Model")
+
+        # System Manufacturer (Using PowerShell)
+        system_manufacturer = get_powershell_data("(Get-WmiObject -Class Win32_ComputerSystem).Manufacturer")
+
+        # Remark
+        remark = "Optional"
+
+        # Return the row of data
+        return {
+            "N": n,
+            "Specification": specification,
+            "Username (Hostname)": username,
+            "Serial number": serial_number,
+            "System Model": system_model,
+            "System Manufacturer": system_manufacturer,
+            "Asset Tag": asset_tag,
+            "Remark": remark
+        }
+    except Exception as e:
+        print(f"Error retrieving system information: {e}")
+        return None
+
+def save_system_info_to_excel(output_file="system_info.xlsx", num_entries=1):
+    """
+    Save system information to an Excel file.
+    """
+    system_data = []
+    for n in range(1, num_entries + 1):
+        info = get_system_info(n)
+        if info:
+            system_data.append(info)
+
+    # Convert to DataFrame
+    df = pd.DataFrame(system_data)
+
+    # Apply table styling
+    with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='System Info')
+
+        # Adjust column widths
+        worksheet = writer.sheets['System Info']
+        for col in worksheet.columns:
+            max_length = 0
+            col_letter = col[0].column_letter  # Get column letter
+            for cell in col:
+                try:  # Necessary to avoid issues with empty cells
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)))
+                except:
+                    pass
+            adjusted_width = max_length + 2
+            worksheet.column_dimensions[col_letter].width = adjusted_width
+
+    print(f"System information saved to {output_file}")
+
+
+if __name__ == "__main__":
+    # Generate system information for the computer
+    save_system_info_to_excel(output_file="system_info.xlsx", num_entries=1)
