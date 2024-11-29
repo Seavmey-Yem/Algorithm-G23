@@ -25,9 +25,8 @@ import pandas as pd
 from openpyxl import load_workbook
 
 def get_powershell_data(command):
-    """
-    Helper function to run PowerShell commands and retrieve output.
-    """
+    
+    # Helper function to run PowerShell commands and retrieve output.   
     try:
         result = subprocess.run(["powershell", "-Command", command], capture_output=True, text=True)
         return result.stdout.strip() or "Unknown"
@@ -48,9 +47,8 @@ def get_harddisk():
     return f"{int(total_space / (1024 ** 3))}GB"  # Convert to GB
 
 def get_system_info(n):
-    """
-    Collect detailed system information matching the table structure.
-    """
+    
+    # Collect detailed system information matching the table structure.
     try:
         processor_info = os.popen("wmic cpu get name").read().strip()
         specification = f"{processor_info}, {get_memory()}, {get_harddisk()}"
@@ -76,9 +74,8 @@ def get_system_info(n):
         return None
 
 def save_system_info_to_excel(output_file="system_info.xlsx", num_entries=1):
-    """
-    Save system information to an Excel file, appending data if the file already exists.
-    """
+    
+    # Save system information to an Excel file, appending data if the file already exists.
     system_data = []
     for n in range(1, num_entries + 1):
         info = get_system_info(n)
@@ -148,7 +145,7 @@ def get_wifi_passwords():
                     password = password_line[0].split(":")[1][1:-1]
                     wifi_passwords[profile] = password
                 else:
-                    wifi_passwords[profile] = "No password set"
+                    wifi_passwords[profile] = "None"
             except subprocess.CalledProcessError:
                 wifi_passwords[profile] = "Error retrieving password"
         return wifi_passwords
@@ -167,7 +164,7 @@ if __name__ == "__main__":
         print("Could not retrieve Wi-Fi profiles.")
 
     print("\nWi-Fi Speed Test:\n")
-    print(check_speed_wifi())
+    # print(check_speed_wifi())
 
 def remove_temp_files():
     """Delete temporary files from the system's TEMP directory."""
@@ -381,7 +378,7 @@ def create_gui():
     def shutdown_system():
         os.system("shutdown /s /t 1")
 
-    restart_button = tk.Button(tab_actions, text="Restart", command=restart_system, bg="#f00", fg="#fff", font=("Arial", 14))
+    restart_button = tk.Button(tab_actions, text="Restart", command=restart_system, bg="orange", fg="#fff", font=("Arial", 14))
     restart_button.pack(pady=20, ipadx=20)
 
     shutdown_button = tk.Button(tab_actions, text="Shutdown", command=shutdown_system, bg="#f00", fg="#fff", font=("Arial", 14))
@@ -442,7 +439,6 @@ def create_gui():
     )
     speed_test_button.pack(pady=10, ipadx=20)
    
-
     # Wi-Fi Passwords
     def show_wifi_passwords():
         passwords = get_wifi_passwords()
