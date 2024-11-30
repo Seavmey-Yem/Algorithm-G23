@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from tkinter import ttk
 import psutil
@@ -15,13 +14,6 @@ import subprocess
 import speedtest
 import pandas as pd
 import os
-
-import os
-import platform
-import socket
-import subprocess
-import psutil
-import pandas as pd
 from openpyxl import load_workbook
 
 def get_powershell_data(command):
@@ -128,7 +120,7 @@ def check_speed_wifi():
 
     return f"Download: {download_speed:.2f} Mbps\nUpload: {upload_speed:.2f} Mbps\nPing: {ping} ms"
 def get_wifi_passwords():
-    """Retrieve and display Wi-Fi passwords for networks the PC has connected to before."""
+    # Retrieve and display Wi-Fi passwords for networks the PC has connected to before.
     command = "netsh wlan show profiles"
     try:
         profiles = subprocess.check_output(command, shell=True).decode("utf-8", errors="ignore")
@@ -185,7 +177,7 @@ def remove_temp_files():
     return temp_files_deleted
 
 def clean_recycle_bin():
-    """Empty the Recycle Bin."""
+    # Empty the Recycle Bin.
     try:
         # SHEmptyRecycleBin function from Windows Shell32.dll
         SHEmptyRecycleBin = ctypes.windll.shell32.SHEmptyRecycleBinW
@@ -226,7 +218,7 @@ if __name__ == "__main__":
     get_os_details()
     
 def get_additional_system_info():
-    """Retrieve additional system information."""
+    # Retrieve additional system information.
     battery = psutil.sensors_battery()
     if battery:
         battery_status = f"{battery.percent}% {'(Charging)' if battery.power_plugged else '(Not Charging)'}"
@@ -277,11 +269,10 @@ def create_gui():
     # Tab 1: System Info
     info_text = tk.Text(tab_info, wrap="word", font=("Arial", 12), bg="#f0f0f0", fg="#333")
     info_text.pack(expand=1, fill="both", padx=10, pady=10)
-
     def refresh_info():
         info = (
             f"Device Name: {platform.node()}\n"
-            f"IP Address: {socket.gethostbyname(socket.gethostname())}\n"
+            f"IP Address: {socket.gethostbyname(socket.gethostname())}\n"  
             f"Processors: {platform.processor()}\n"
             f"Windows Version: {platform.version()}\n"
             f"Type: {platform.architecture()[0]}\n"
@@ -344,8 +335,7 @@ def create_gui():
 
     # Animate the Graphs
     ani = animation.FuncAnimation(fig, update_graph, interval=1000)
-
-        # Print Functions (added without changing your existing code)
+     # Print Functions (added without changing your existing code)
     def print_cpu_usage():
         cpu_percent = psutil.cpu_percent(interval=1)
         print(f"CPU Usage:")
@@ -451,9 +441,7 @@ def create_gui():
     wifi_password_button = tk.Button(
         tab_wifi, text="Show Wi-Fi Passwords", command=show_wifi_passwords, bg="#f44336", fg="white", font=("Arial", 12)
     )
-    wifi_password_button.pack(pady=10, ipadx=20)
-    
-
+    wifi_password_button.pack(pady=10, ipadx=20) 
     root.mainloop()
     
 # Run the application
